@@ -1,0 +1,54 @@
+[package]
+name = "edit"
+version = "0.1.0"
+authors = ["Robin Appelman <robin@icewind.nl>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "edit"
+path = "src/edit.rs"
+
+[features]
+default = ["console_error_panic_hook"]
+
+[dependencies]
+bitbuffer = "0.10.5"
+tf-demo-parser = { version = "0.4", git = "https://github.com/demostf/parser" }
+#tf-demo-parser = { version = "0.4", path = "../tf-demo-parser" }
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+web-sys = { version = "0.3", features = ["console"] }
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.6", optional = true }
+
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. It is slower than the default
+# allocator, however.
+#
+# Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
+wee_alloc = { version = "0.4.5", optional = true }
+clap = { version = "3.1.9", features = ["derive"] }
+num_enum = "0.5.7"
+parse-display = "0.5.5"
+serde = { version = "1.0.139", features = ["derive"] }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.13"
+
+[profile.release]
+lto = true
+
+[profile.dev]
+opt-level = 2
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = true
