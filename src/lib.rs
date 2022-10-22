@@ -2,6 +2,7 @@ mod mutate;
 mod pov;
 mod clean;
 mod cond;
+mod cut;
 
 use wasm_bindgen::prelude::*;
 use tf_demo_parser::{Demo, DemoParser};
@@ -12,6 +13,7 @@ use bitbuffer::{BitRead, BitWriteStream, LittleEndian};
 use tf_demo_parser::demo::message::packetentities::EntityId;
 use serde::{Serialize, Deserialize};
 use bitbuffer::BitWrite;
+use tf_demo_parser::demo::data::DemoTick;
 use crate::clean::clean_demo;
 use crate::cond::strip_cond;
 use crate::mutate::{MutatorList, PacketMutator};
@@ -40,12 +42,20 @@ fn set_panic_hook() {
 pub struct EditOptions {
     pub unlock_pov: bool,
     pub remove_conditions: Vec<CondOptions>,
+    #[serde(default)]
+    pub cut: Option<TickRange>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CondOptions {
-    entity: u32,
+    entity: EntityId,
     mask: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TickRange {
+    from: DemoTick,
+    to: DemoTick,
 }
 
 #[wasm_bindgen]
@@ -62,7 +72,6 @@ pub fn rust_edit(input: &[u8], options: EditOptions) -> Vec<u8> {
 
         let demo = Demo::new(&input);
         let spectator_id = find_stv(&demo).expect("no stv bot found");
-        dbg!(spectator_id);
 
         let mut stream = demo.get_stream();
         let header = Header::read(&mut stream).unwrap();
@@ -86,6 +95,10 @@ pub fn rust_edit(input: &[u8], options: EditOptions) -> Vec<u8> {
 
         if options.unlock_pov {
             unlock_pov(&mut mutators, spectator_id);
+        }
+
+        if let Some(cut) = options.cut {
+
         }
 
 

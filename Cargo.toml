@@ -2,7 +2,7 @@
 name = "edit"
 version = "0.1.0"
 authors = ["Robin Appelman <robin@icewind.nl>"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -16,8 +16,8 @@ default = ["console_error_panic_hook"]
 
 [dependencies]
 bitbuffer = "0.10.5"
-tf-demo-parser = { version = "0.4", git = "https://github.com/demostf/parser" }
-#tf-demo-parser = { version = "0.4", path = "../tf-demo-parser" }
+#tf-demo-parser = { version = "0.4", git = "https://github.com/demostf/parser" }
+tf-demo-parser = { version = "0.4", path = "../tf-demo-parser" }
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
 web-sys = { version = "0.3", features = ["console"] }
 
