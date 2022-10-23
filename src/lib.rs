@@ -3,6 +3,7 @@ mod pov;
 mod clean;
 mod cond;
 mod cut;
+mod options;
 
 use wasm_bindgen::prelude::*;
 use tf_demo_parser::{Demo, DemoParser};
@@ -16,7 +17,9 @@ use bitbuffer::BitWrite;
 use tf_demo_parser::demo::data::DemoTick;
 use crate::clean::clean_demo;
 use crate::cond::strip_cond;
+use crate::cut::cut;
 use crate::mutate::{MutatorList, PacketMutator};
+pub use crate::options::EditOptions;
 use crate::pov::unlock_pov;
 
 extern crate web_sys;
@@ -28,50 +31,32 @@ extern crate web_sys;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 fn set_panic_hook() {
-    // When the `console_error_panic_hook` feature is enabled, we can call the
-    // `set_panic_hook` function at least once during initialization, and then
-    // we will get better error messages if our code ever panics.
-    //
-    // For more details see
-    // https://github.com/rustwasm/console_error_panic_hook#readme
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct EditOptions {
-    pub unlock_pov: bool,
-    pub remove_conditions: Vec<CondOptions>,
-    #[serde(default)]
-    pub cut: Option<TickRange>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CondOptions {
-    entity: EntityId,
-    mask: u32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct TickRange {
-    from: DemoTick,
-    to: DemoTick,
 }
 
 #[wasm_bindgen]
 pub fn edit(input: &[u8], options: JsValue) -> Vec<u8> {
     set_panic_hook();
     let options: EditOptions = options.into_serde().expect("invalid options");
-    rust_edit(input, options)
+    edit_inner(input, options)
 }
 
-pub fn rust_edit(input: &[u8], options: EditOptions) -> Vec<u8> {
+pub fn edit_inner(input: &[u8], options: EditOptions) -> Vec<u8> {
+    if options.cut.is_some() {
+        cut(input, options)
+    } else {
+        no_cut(input, options)
+    }
+}
+
+fn no_cut(input: &[u8], options: EditOptions) -> Vec<u8> {
     let mut out_buffer = Vec::with_capacity(input.len());
     {
         let mut out_stream = BitWriteStream::new(&mut out_buffer, LittleEndian);
 
         let demo = Demo::new(&input);
-        let spectator_id = find_stv(&demo).expect("no stv bot found");
+        let spectator_id = find_stv(&demo).unwrap_or_else(|| EntityId::from(1u32));
 
         let mut stream = demo.get_stream();
         let header = Header::read(&mut stream).unwrap();
@@ -81,26 +66,7 @@ pub fn rust_edit(input: &[u8], options: EditOptions) -> Vec<u8> {
         let mut handler = DemoHandler::default();
         handler.handle_header(&header);
 
-        let mut mutators = MutatorList::new();
-        clean_demo(&mut mutators);
-
-        for cond_options in options.remove_conditions {
-            let entity = if cond_options.entity > 0 {
-                Some(EntityId::from(cond_options.entity))
-            } else {
-                None
-            };
-            strip_cond(&mut mutators, entity, cond_options.mask);
-        }
-
-        if options.unlock_pov {
-            unlock_pov(&mut mutators, spectator_id);
-        }
-
-        if let Some(cut) = options.cut {
-
-        }
-
+        let mutators = options.as_mutator(spectator_id);
 
         while let Some(mut packet) = packets.next(&handler.state_handler).unwrap() {
             mutators.mutate_packet(&mut packet, &handler.state_handler);

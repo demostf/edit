@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet};
 use std::iter::once;
 use std::mem::{replace, take};
 use std::num::NonZeroU32;
@@ -92,7 +92,7 @@ impl ActiveEntities {
         mut self,
         state: &ParserState,
         delta: ServerTick,
-        tick: u32,
+        tick: DemoTick,
         parser_state: &ParserState,
     ) -> (
         impl IntoIterator<Item = PacketEntitiesMessage>,

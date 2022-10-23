@@ -16,13 +16,13 @@ use tf_demo_parser::demo::packet::stop::StopPacket;
 use tf_demo_parser::demo::packet::{Packet, PacketType};
 use tf_demo_parser::demo::parser::{DemoHandler, Encode, NullHandler, RawPacketStream};
 use tf_demo_parser::{Demo, DemoParser, MessageType, ParserState};
-use tf_demo_parser::demo::data::ServerTick;
+use tf_demo_parser::demo::data::{DemoTick, ServerTick};
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 use crate::cut::entity::ActiveEntities;
 use crate::cut::string_tables::StringTablesUpdates;
 use crate::mutate::MessageMutator;
-use crate::{MutatorList, PacketMutator};
+use crate::{EditOptions, find_stv, MutatorList, PacketMutator};
 
 const PRESERVE_PACKETS: &[PacketType] = &[
     PacketType::Signon,
@@ -31,22 +31,26 @@ const PRESERVE_PACKETS: &[PacketType] = &[
     PacketType::SyncTick,
 ];
 
-#[wasm_bindgen]
-pub fn cut(input: &[u8], start_tick: u32, end_tick: u32) -> Vec<u8> {
+pub fn cut(input: &[u8], options: EditOptions) -> Vec<u8> {
     let mut out_buffer = Vec::with_capacity(input.len());
     {
         let mut out_stream = BitWriteStream::new(&mut out_buffer, LittleEndian);
 
         let demo = Demo::new(&input);
+        let spectator_id = find_stv(&demo).unwrap_or_else(|| EntityId::from(1u32));
         let mut stream = demo.get_stream();
         let mut header = Header::read(&mut stream).unwrap();
 
-        let start_tick = min(header.ticks - 10, start_tick);
-        let end_tick = min(header.ticks, end_tick);
+        let mut mutators = options.as_mutator(spectator_id);
+        let start_tick = options.cut.unwrap().from;
+        let end_tick = options.cut.unwrap().to;
+
+        let start_tick = min(DemoTick::from(header.ticks - 10), start_tick);
+        let end_tick = min(DemoTick::from(header.ticks), end_tick);
         let duration_per_tick = header.ticks as f32 / header.duration;
 
-        header.ticks = end_tick - start_tick;
-        header.duration = (end_tick - start_tick) as f32 * duration_per_tick;
+        header.ticks = (end_tick - start_tick).into();
+        header.duration = header.ticks as f32 * duration_per_tick;
         header.write(&mut out_stream).unwrap();
 
         let mut packets = RawPacketStream::new(stream.clone());
@@ -122,7 +126,6 @@ pub fn cut(input: &[u8], start_tick: u32, end_tick: u32) -> Vec<u8> {
                 .unwrap();
         }
 
-        let mut mutators = MutatorList::new();
         mutators.push_message_mutator(DeleteFilter::new(start_entities, start_state.server_tick));
         mutators.push_packet_mutator(move |packet: &mut Packet| {
             packet.set_tick(packet.tick() - start_tick)
@@ -166,7 +169,7 @@ struct StartState<'a> {
 fn skip_start<'a>(
     handler: &mut DemoHandler<'a, NullHandler>,
     packets: &mut RawPacketStream<'a>,
-    start_tick: u32,
+    start_tick: DemoTick,
 ) -> StartState<'a> {
     let mut entities = ActiveEntities::default();
     let mut table_updates = StringTablesUpdates::default();

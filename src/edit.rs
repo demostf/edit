@@ -1,17 +1,20 @@
 use clap::Parser;
-use edit::{EditOptions, rust_edit};
+use edit::{edit_inner, EditOptions};
 use std::fs;
 
 #[derive(Parser, Debug)]
-#[clap(author, version, about, long_about = None)]
+#[command(author, version, about, long_about = None)]
 struct Args {
     /// Path to the source demo
     path: String,
+    #[arg(long)]
+    unlock_pov: bool,
+
 }
 
 fn main() {
     let args = Args::parse();
     let file = fs::read(&args.path).unwrap();
-    let output = rust_edit(&file, EditOptions::default());
+    let output = edit_inner(&file, EditOptions::default());
     fs::write("out.dem", output).unwrap();
 }
