@@ -7,6 +7,7 @@ use tf_demo_parser::demo::message::Message;
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EditOptions {
     pub unlock_pov: bool,
+    #[serde(default)]
     pub remove_conditions: Vec<CondOptions>,
     #[serde(default)]
     pub cut: Option<TickRange>,
