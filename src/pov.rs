@@ -3,7 +3,6 @@ use tf_demo_parser::demo::message::Message;
 use tf_demo_parser::demo::message::packetentities::{EntityId, PacketEntity, UpdateType};
 use tf_demo_parser::demo::message::usermessage::{UserMessage};
 use tf_demo_parser::demo::packet::Packet;
-use tf_demo_parser::demo::sendprop::{SendPropIdentifier, SendPropValue};
 use tf_demo_parser::ParserState;
 use crate::mutate::{MessageMutator, MutatorList};
 
@@ -22,7 +21,7 @@ impl AddStvEntity {
 }
 
 impl MessageMutator for AddStvEntity {
-    fn mutate_message(&self, message: &mut Message, state: &ParserState) {
+    fn mutate_message(&self, message: &mut Message, _state: &ParserState) {
         if !self.added.get() {
             if let Message::PacketEntities(ent_message) = message {
                 if ent_message.base_line == 0 {

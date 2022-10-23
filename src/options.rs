@@ -2,6 +2,7 @@ use tf_demo_parser::demo::data::DemoTick;
 use tf_demo_parser::demo::message::packetentities::EntityId;
 use crate::{clean_demo, MutatorList, strip_cond, unlock_pov};
 use serde::{Serialize, Deserialize};
+use tf_demo_parser::demo::message::Message;
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EditOptions {
@@ -14,6 +15,13 @@ pub struct EditOptions {
 impl EditOptions {
     pub fn as_mutator(&self, spectator_id: EntityId) -> MutatorList {
         let mut mutators = MutatorList::new();
+
+        mutators.push_message_mutator(|message: &mut Message| {
+            if let Message::ServerInfo(info) = message {
+                info.server_name = format!("{} - Edited", info.server_name);
+            }
+        });
+
         clean_demo(&mut mutators);
 
         for cond_options in self.remove_conditions.iter() {
