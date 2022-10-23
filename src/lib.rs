@@ -19,7 +19,7 @@ use crate::clean::clean_demo;
 use crate::cond::strip_cond;
 use crate::cut::cut;
 use crate::mutate::{MutatorList, PacketMutator};
-pub use crate::options::EditOptions;
+pub use crate::options::{EditOptions, TickRange, CondOptions};
 use crate::pov::unlock_pov;
 
 extern crate web_sys;
