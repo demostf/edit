@@ -8,3 +8,5 @@ out.dem
 *.dem
 .direnv
 result
+dist
+node_modules

@@ -21,8 +21,6 @@ impl AddStvEntity {
     }
 }
 
-const TEAM_PROP: SendPropIdentifier = SendPropIdentifier::new("DT_BaseEntity", "m_iTeamNum");
-
 impl MessageMutator for AddStvEntity {
     fn mutate_message(&self, message: &mut Message, state: &ParserState) {
         if !self.added.get() {
