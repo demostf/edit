@@ -36,13 +36,13 @@ fn set_panic_hook() {
 }
 
 #[wasm_bindgen]
-pub fn edit(input: &[u8], options: JsValue) -> Vec<u8> {
+pub fn edit_js(input: &[u8], options: JsValue) -> Vec<u8> {
     set_panic_hook();
     let options: EditOptions = serde_wasm_bindgen::from_value(options).expect("invalid options");
-    edit_inner(input, options)
+    edit(input, options)
 }
 
-pub fn edit_inner(input: &[u8], options: EditOptions) -> Vec<u8> {
+pub fn edit(input: &[u8], options: EditOptions) -> Vec<u8> {
     if options.cut.is_some() {
         cut(input, options)
     } else {

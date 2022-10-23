@@ -10,5 +10,5 @@ export interface TickRange {
 
 export async function edit(bytes: Uint8Array, options: EditOptions): Promise<Uint8Array> {
     let m = await import(/* webpackChunkName: "demos-tf-edit" */ "../pkg/index.js");
-    return m.edit(bytes, options);
+    return m.edit_js(bytes, options);
 }

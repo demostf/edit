@@ -1,5 +1,5 @@
 use clap::Parser;
-use edit::{edit_inner, EditOptions, TickRange};
+use edit::{edit, EditOptions, TickRange};
 use std::fs;
 
 #[derive(Parser, Debug)]
@@ -33,6 +33,6 @@ fn main() {
     let args: Args = Args::parse();
     let options = args.get_options();
     let file = fs::read(&args.path).unwrap();
-    let output = edit_inner(&file, options);
+    let output = edit(&file, options);
     fs::write("out.dem", output).unwrap();
 }
