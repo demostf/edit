@@ -34,13 +34,10 @@ impl MessageMutator for AddStvEntity {
                     }
                     let server_class = player_entity.server_class;
 
-                    let mut team_prop = player_entity.get_prop_by_identifier(&TEAM_PROP, state).unwrap().clone();
-                    team_prop.value = SendPropValue::Integer(1);
-
                     ent_message.entities.push(PacketEntity {
                         server_class,
                         entity_index: self.entity_index,
-                        props: vec![team_prop],
+                        props: vec![],
                         in_pvs: false,
                         update_type: UpdateType::Enter,
                         serial_number: 1234567,

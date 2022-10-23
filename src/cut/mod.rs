@@ -62,7 +62,8 @@ pub fn cut(input: &[u8], options: EditOptions) -> Vec<u8> {
 
         let start_state = skip_start(&mut start_handler, &mut packets, start_tick);
 
-        for packet in start_state.start_packets {
+        for mut packet in start_state.start_packets {
+            mutators.mutate_packet(&mut packet, &handler.state_handler);
             packet
                 .encode(&mut out_stream, &handler.state_handler)
                 .unwrap();
