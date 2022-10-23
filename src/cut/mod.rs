@@ -2,27 +2,27 @@ mod entity;
 mod string_tables;
 
 use bitbuffer::{BitRead, BitWrite, BitWriteStream, LittleEndian};
-use std::cmp::{max, min};
+use std::cmp::{min};
 use std::collections::BTreeSet;
 use std::convert::TryInto;
 use std::iter::once;
 use std::mem::take;
 use tf_demo_parser::demo::header::Header;
 use tf_demo_parser::demo::message::packetentities::{EntityId, PacketEntitiesMessage, UpdateType};
-use tf_demo_parser::demo::message::usermessage::{UserMessage, UserMessageType};
+
 use tf_demo_parser::demo::message::{Message, NetTickMessage};
-use tf_demo_parser::demo::packet::message::{MessagePacket, MessagePacketMeta};
+use tf_demo_parser::demo::packet::message::{MessagePacket};
 use tf_demo_parser::demo::packet::stop::StopPacket;
 use tf_demo_parser::demo::packet::{Packet, PacketType};
 use tf_demo_parser::demo::parser::{DemoHandler, Encode, NullHandler, RawPacketStream};
-use tf_demo_parser::{Demo, DemoParser, MessageType, ParserState};
+use tf_demo_parser::{Demo, ParserState};
 use tf_demo_parser::demo::data::{DemoTick, ServerTick};
-use wasm_bindgen::prelude::*;
-use web_sys::console;
+
+
 use crate::cut::entity::ActiveEntities;
 use crate::cut::string_tables::StringTablesUpdates;
 use crate::mutate::MessageMutator;
-use crate::{EditOptions, find_stv, MutatorList, PacketMutator};
+use crate::{EditOptions, find_stv, PacketMutator};
 
 const PRESERVE_PACKETS: &[PacketType] = &[
     PacketType::Signon,

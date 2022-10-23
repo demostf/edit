@@ -1,13 +1,13 @@
 use std::collections::{BTreeMap, BTreeSet};
-use std::iter::once;
-use std::mem::{replace, take};
-use std::num::NonZeroU32;
+
+
+
 use tf_demo_parser::demo::data::{DemoTick, ServerTick};
 use tf_demo_parser::demo::message::packetentities::{
     EntityId, PacketEntitiesMessage, PacketEntity, UpdateType,
 };
 use tf_demo_parser::demo::packet::datatable::ClassId;
-use tf_demo_parser::demo::sendprop::{SendPropIdentifier, SendPropValue};
+use tf_demo_parser::demo::sendprop::{SendPropIdentifier};
 use tf_demo_parser::ParserState;
 
 #[derive(Default)]
@@ -92,7 +92,7 @@ impl ActiveEntities {
         mut self,
         state: &ParserState,
         delta: ServerTick,
-        tick: DemoTick,
+        _tick: DemoTick,
         parser_state: &ParserState,
     ) -> (
         impl IntoIterator<Item = PacketEntitiesMessage>,

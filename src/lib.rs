@@ -12,9 +12,9 @@ use tf_demo_parser::demo::parser::{RawPacketStream, DemoHandler, Encode};
 use tf_demo_parser::demo::packet::PacketType;
 use bitbuffer::{BitRead, BitWriteStream, LittleEndian};
 use tf_demo_parser::demo::message::packetentities::EntityId;
-use serde::{Serialize, Deserialize};
+
 use bitbuffer::BitWrite;
-use tf_demo_parser::demo::data::DemoTick;
+
 use crate::clean::clean_demo;
 use crate::cond::strip_cond;
 use crate::cut::cut;
@@ -38,7 +38,7 @@ fn set_panic_hook() {
 #[wasm_bindgen]
 pub fn edit(input: &[u8], options: JsValue) -> Vec<u8> {
     set_panic_hook();
-    let options: EditOptions = options.into_serde().expect("invalid options");
+    let options: EditOptions = serde_wasm_bindgen::from_value(options).expect("invalid options");
     edit_inner(input, options)
 }
 
