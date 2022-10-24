@@ -27,7 +27,9 @@ impl MessageMutator for AddStvEntity {
                 if ent_message.base_line == 0 {
                     let player_entity = ent_message.entities.iter().find(|ent| ent.entity_index >= 1 && ent.entity_index < 255).expect("Failed to find a player entity");
                     if player_entity.entity_index == self.entity_index {
-                        panic!("already an stv entity?");
+                        // already stv?
+                        self.added.set(true);
+                        return;
                     }
                     let server_class = player_entity.server_class;
 
