@@ -14,6 +14,7 @@ use bitbuffer::{BitRead, BitWriteStream, LittleEndian};
 use tf_demo_parser::demo::message::packetentities::EntityId;
 
 use bitbuffer::BitWrite;
+use tf_demo_parser::demo::data::DemoTick;
 
 use crate::clean::clean_demo;
 use crate::cond::strip_cond;
@@ -48,6 +49,26 @@ pub fn edit(input: &[u8], options: EditOptions) -> Vec<u8> {
     } else {
         no_cut(input, options)
     }
+}
+
+#[wasm_bindgen]
+pub fn count_ticks(input: &[u8]) -> u32 {
+    let demo = Demo::new(&input);
+    let mut stream = demo.get_stream();
+    let header = Header::read(&mut stream).unwrap();
+
+    let mut tick = DemoTick::default();
+
+    let mut packets = RawPacketStream::new(stream);
+    let mut handler = DemoHandler::default();
+    handler.handle_header(&header);
+
+    while let Some(packet) = packets.next(&handler.state_handler).unwrap() {
+        tick = packet.tick();
+        handler.handle_packet(packet).unwrap();
+    }
+
+    tick.into()
 }
 
 fn no_cut(input: &[u8], options: EditOptions) -> Vec<u8> {

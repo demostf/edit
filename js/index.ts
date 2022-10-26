@@ -12,3 +12,8 @@ export async function edit(bytes: Uint8Array, options: EditOptions): Promise<Uin
     let m = await import(/* webpackChunkName: "demos-tf-edit" */ "../pkg/index.js");
     return m.edit_js(bytes, options);
 }
+
+export async function count_ticks(bytes: Uint8Array): Promise<number> {
+    let m = await import(/* webpackChunkName: "demos-tf-edit" */ "../pkg/index.js");
+    return m.count_ticks(bytes);
+}
