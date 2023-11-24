@@ -13,7 +13,7 @@ module.exports = {
     output: {
         path: dist,
         filename: "[name].js",
-        libraryTarget: 'commonjs'
+        libraryTarget: 'commonjs-module'
     },
     devServer: {
         contentBase: dist,
