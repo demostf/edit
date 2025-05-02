@@ -14,11 +14,11 @@ required-features = ["cli"]
 
 [features]
 default = ["console_error_panic_hook"]
-cli = ["clap"]
+cli = ["clap", "env_logger"]
 
 [dependencies]
 bitbuffer = "0.10.5"
-tf-demo-parser = { version = "0.4", git = "https://github.com/demostf/parser" }
+tf-demo-parser = { version = "0.5" }
 #tf-demo-parser = { version = "0.4", path = "../tf-demo-parser" }
 wasm-bindgen = { version = "0.2.45" }
 serde-wasm-bindgen = "0.4"
@@ -37,9 +37,11 @@ console_error_panic_hook = { version = "0.1.6", optional = true }
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
 wee_alloc = { version = "0.4.5", optional = true }
 clap = { version = "4.0.18", features = ["derive"], optional = true }
+env_logger = { version = "0.11.8", optional = true }
 num_enum = "0.5.7"
 parse-display = "0.5.5"
 serde = { version = "1.0.139", features = ["derive"] }
+log = { version = "0.4.17", features = [] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
