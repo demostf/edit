@@ -1,10 +1,10 @@
+use crate::mutate::{MessageMutator, MutatorList};
 use std::cell::Cell;
-use tf_demo_parser::demo::message::Message;
 use tf_demo_parser::demo::message::packetentities::{EntityId, PacketEntity, UpdateType};
-use tf_demo_parser::demo::message::usermessage::{UserMessage};
+use tf_demo_parser::demo::message::usermessage::UserMessage;
+use tf_demo_parser::demo::message::Message;
 use tf_demo_parser::demo::packet::Packet;
 use tf_demo_parser::ParserState;
-use crate::mutate::{MessageMutator, MutatorList};
 
 struct AddStvEntity {
     added: Cell<bool>,
@@ -25,7 +25,11 @@ impl MessageMutator for AddStvEntity {
         if !self.added.get() {
             if let Message::PacketEntities(ent_message) = message {
                 if ent_message.base_line == 0 {
-                    let player_entity = ent_message.entities.iter().find(|ent| ent.entity_index >= 1 && ent.entity_index < 255).expect("Failed to find a player entity");
+                    let player_entity = ent_message
+                        .entities
+                        .iter()
+                        .find(|ent| ent.entity_index >= 1 && ent.entity_index < 255)
+                        .expect("Failed to find a player entity");
                     if player_entity.entity_index == self.entity_index {
                         // already stv?
                         self.added.set(true);
@@ -42,9 +46,11 @@ impl MessageMutator for AddStvEntity {
                         serial_number: 1234567,
                         delay: None,
                         delta: None,
-                        baseline_index: 0
+                        baseline_index: 0,
                     });
-                    ent_message.entities.sort_by(|a, b| a.entity_index.cmp(&b.entity_index));
+                    ent_message
+                        .entities
+                        .sort_by(|a, b| a.entity_index.cmp(&b.entity_index));
                     self.added.set(true);
                 }
             }
@@ -58,9 +64,7 @@ pub fn unlock_pov(mutators: &mut MutatorList, spectator_id: EntityId) {
             info.player_slot = u32::from(spectator_id) as u8 - 1;
         }
     });
-    mutators.push_message_filter(|message: &Message| {
-        !matches!(message, Message::SetView(_))
-    });
+    mutators.push_message_filter(|message: &Message| !matches!(message, Message::SetView(_)));
     mutators.push_message_filter(|message: &Message| {
         !matches!(message, Message::UserMessage(UserMessage::VGuiMenu(_)))
     });

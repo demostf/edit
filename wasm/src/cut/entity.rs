@@ -1,13 +1,11 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-
-
 use tf_demo_parser::demo::data::{DemoTick, ServerTick};
 use tf_demo_parser::demo::message::packetentities::{
     EntityId, PacketEntitiesMessage, PacketEntity, UpdateType,
 };
 use tf_demo_parser::demo::packet::datatable::ClassId;
-use tf_demo_parser::demo::sendprop::{SendPropIdentifier};
+use tf_demo_parser::demo::sendprop::SendPropIdentifier;
 use tf_demo_parser::ParserState;
 
 #[derive(Default)]
@@ -20,7 +18,12 @@ pub struct ActiveEntities {
 }
 
 impl ActiveEntities {
-    pub fn handle_message(&mut self, msg: &PacketEntitiesMessage, state: &ParserState, tick: DemoTick) {
+    pub fn handle_message(
+        &mut self,
+        msg: &PacketEntitiesMessage,
+        state: &ParserState,
+        tick: DemoTick,
+    ) {
         self.max_entities = self.max_entities.max(msg.max_entries);
         for entity in &msg.entities {
             self.removed_entities.remove(&entity.entity_index);
@@ -160,7 +163,7 @@ impl ActiveEntities {
                     },
                     serial_number: 0,
                     delay: None,
-                    delta: None
+                    delta: None,
                 }))
                 .collect::<Vec<_>>(),
             self.max_entities,

@@ -27,7 +27,7 @@ impl<T: MessageMutator> PacketMutator for PacketMessageMutator<T> {
                     .messages
                     .iter_mut()
                     .for_each(|msg| self.mutator.mutate_message(msg, state));
-            },
+            }
             _ => {}
         }
     }
@@ -114,4 +114,3 @@ impl PacketMutator for MutatorList {
         }
     }
 }
-

@@ -20,7 +20,10 @@ impl Args {
         EditOptions {
             unlock_pov: self.unlock_pov,
             cut: if let (Some(from), Some(to)) = (self.from, self.to) {
-                Some(TickRange { from: from.into(), to: to.into() })
+                Some(TickRange {
+                    from: from.into(),
+                    to: to.into(),
+                })
             } else {
                 None
             },
@@ -30,6 +33,7 @@ impl Args {
 }
 
 fn main() {
+    env_logger::init();
     let args: Args = Args::parse();
     let options = args.get_options();
     let file = fs::read(&args.path).unwrap();

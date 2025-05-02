@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use tf_demo_parser::demo::message::stringtable::{UpdateStringTableMessage};
+use tf_demo_parser::demo::message::stringtable::UpdateStringTableMessage;
 use tf_demo_parser::demo::message::Message;
 use tf_demo_parser::demo::packet::stringtable::StringTableEntry;
 

@@ -1,17 +1,18 @@
-mod mutate;
-mod pov;
 mod clean;
 mod cond;
 mod cut;
+pub mod missing_preserve;
+mod mutate;
 mod options;
+mod pov;
 
-use wasm_bindgen::prelude::*;
-use tf_demo_parser::{Demo, DemoParser};
-use tf_demo_parser::demo::header::Header;
-use tf_demo_parser::demo::parser::{RawPacketStream, DemoHandler, Encode};
-use tf_demo_parser::demo::packet::PacketType;
 use bitbuffer::{BitRead, BitWriteStream, LittleEndian};
+use tf_demo_parser::demo::header::Header;
 use tf_demo_parser::demo::message::packetentities::EntityId;
+use tf_demo_parser::demo::packet::PacketType;
+use tf_demo_parser::demo::parser::{DemoHandler, Encode, RawPacketStream};
+use tf_demo_parser::{Demo, DemoParser};
+use wasm_bindgen::prelude::*;
 
 use bitbuffer::BitWrite;
 use tf_demo_parser::demo::data::DemoTick;
@@ -20,7 +21,7 @@ use crate::clean::clean_demo;
 use crate::cond::strip_cond;
 use crate::cut::cut;
 use crate::mutate::{MutatorList, PacketMutator};
-pub use crate::options::{EditOptions, TickRange, CondOptions};
+pub use crate::options::{CondOptions, EditOptions, TickRange};
 use crate::pov::unlock_pov;
 
 extern crate web_sys;
@@ -92,7 +93,9 @@ fn no_cut(input: &[u8], options: EditOptions) -> Vec<u8> {
         while let Some(mut packet) = packets.next(&handler.state_handler).unwrap() {
             mutators.mutate_packet(&mut packet, &handler.state_handler);
 
-            if packet.packet_type() != PacketType::ConsoleCmd && packet.packet_type() != PacketType::UserCmd {
+            if packet.packet_type() != PacketType::ConsoleCmd
+                && packet.packet_type() != PacketType::UserCmd
+            {
                 packet
                     .encode(&mut out_stream, &handler.state_handler)
                     .unwrap();
@@ -106,6 +109,8 @@ fn no_cut(input: &[u8], options: EditOptions) -> Vec<u8> {
 fn find_stv(demo: &Demo) -> Option<EntityId> {
     let parser = DemoParser::new(demo.get_stream());
     let (_, data) = parser.parse().expect("failed to parse demo");
-    data.users.values().find(|user| user.steam_id == "BOT")
+    data.users
+        .values()
+        .find(|user| user.steam_id == "BOT")
         .map(|user| user.entity_id)
 }

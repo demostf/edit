@@ -2,7 +2,7 @@ mod entity;
 mod string_tables;
 
 use bitbuffer::{BitRead, BitWrite, BitWriteStream, LittleEndian};
-use std::cmp::{min};
+use std::cmp::min;
 use std::collections::BTreeSet;
 use std::convert::TryInto;
 use std::iter::once;
@@ -10,19 +10,18 @@ use std::mem::take;
 use tf_demo_parser::demo::header::Header;
 use tf_demo_parser::demo::message::packetentities::{EntityId, PacketEntitiesMessage, UpdateType};
 
+use tf_demo_parser::demo::data::{DemoTick, ServerTick};
 use tf_demo_parser::demo::message::{Message, NetTickMessage};
-use tf_demo_parser::demo::packet::message::{MessagePacket};
+use tf_demo_parser::demo::packet::message::MessagePacket;
 use tf_demo_parser::demo::packet::stop::StopPacket;
 use tf_demo_parser::demo::packet::{Packet, PacketType};
 use tf_demo_parser::demo::parser::{DemoHandler, Encode, NullHandler, RawPacketStream};
 use tf_demo_parser::{Demo, ParserState};
-use tf_demo_parser::demo::data::{DemoTick, ServerTick};
-
 
 use crate::cut::entity::ActiveEntities;
 use crate::cut::string_tables::StringTablesUpdates;
 use crate::mutate::MessageMutator;
-use crate::{EditOptions, find_stv, PacketMutator};
+use crate::{find_stv, EditOptions, PacketMutator};
 
 const PRESERVE_PACKETS: &[PacketType] = &[
     PacketType::Signon,
@@ -78,10 +77,12 @@ pub fn cut(input: &[u8], options: EditOptions) -> Vec<u8> {
             .encode()
             .into_iter()
             .map(|msg| Message::UpdateStringTable(msg));
-        let (baseline_updates, entity_update, removed_update) =
-            start_state
-                .entities
-                .encode(&start_handler.state_handler, delta_tick - 2, start_tick, &start_handler.state_handler);
+        let (baseline_updates, entity_update, removed_update) = start_state.entities.encode(
+            &start_handler.state_handler,
+            delta_tick - 2,
+            start_tick,
+            &start_handler.state_handler,
+        );
         let baseline_updates = baseline_updates.into_iter().map(Message::PacketEntities);
         let start_packets = string_table_updates
             .chain(baseline_updates)
@@ -105,7 +106,8 @@ pub fn cut(input: &[u8], options: EditOptions) -> Vec<u8> {
         }
 
         // create the net ticks needed for later deltas
-        let fill_ticks = (delta_tick + 1).range_inclusive(start_state.server_tick)
+        let fill_ticks = (delta_tick + 1)
+            .range_inclusive(start_state.server_tick)
             .into_iter()
             .map(|tick| net_tick(tick));
         let fill_packets = fill_ticks.map(|msg| {

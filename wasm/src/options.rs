@@ -1,7 +1,7 @@
+use crate::{clean_demo, strip_cond, unlock_pov, MutatorList};
+use serde::{Deserialize, Serialize};
 use tf_demo_parser::demo::data::DemoTick;
 use tf_demo_parser::demo::message::packetentities::EntityId;
-use crate::{clean_demo, MutatorList, strip_cond, unlock_pov};
-use serde::{Serialize, Deserialize};
 use tf_demo_parser::demo::message::Message;
 
 #[derive(Debug, Serialize, Deserialize, Default)]

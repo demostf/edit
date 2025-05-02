@@ -1,9 +1,9 @@
-use tf_demo_parser::demo::message::Message;
-use tf_demo_parser::demo::message::packetentities::{EntityId, PacketEntity};
-use tf_demo_parser::demo::sendprop::{SendPropIdentifier, SendPropValue};
-use tf_demo_parser::ParserState;
 use crate::mutate::MessageMutator;
 use crate::MutatorList;
+use tf_demo_parser::demo::message::packetentities::{EntityId, PacketEntity};
+use tf_demo_parser::demo::message::Message;
+use tf_demo_parser::demo::sendprop::{SendPropIdentifier, SendPropValue};
+use tf_demo_parser::ParserState;
 
 #[allow(dead_code)]
 #[derive(Copy, Clone, Debug)]
