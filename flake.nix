@@ -1,7 +1,7 @@
 {
   inputs = {
     utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "nixpkgs/release-22.11";
+    nixpkgs.url = "nixpkgs/release-24.11";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
