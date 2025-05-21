@@ -1,3 +1,5 @@
+# Moved to https://codeberg.org/demostf/edit
+
 # Demo editor
 
 ## Rust api
